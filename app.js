@@ -46,6 +46,9 @@ function renderMeta(meta = {}) {
 
 function renderList(id, items = []) {
   const container = document.getElementById(id);
+  if (!container) {
+    return;
+  }
   container.replaceChildren(...items.map((item) => {
     const li = document.createElement("li");
     li.textContent = item;
@@ -198,7 +201,7 @@ function renderNav(sections = []) {
     strong.textContent = `${String(index + 1).padStart(2, "0")} ${section.title}`;
 
     const span = document.createElement("span");
-    span.textContent = section.focus;
+    span.textContent = section.timeRange || section.focus || "";
 
     link.append(strong, span);
     return link;
@@ -223,7 +226,13 @@ function renderSections(sections = []) {
     node.querySelector(".segment-index").textContent = String(index + 1).padStart(2, "0");
     node.querySelector(".segment-kicker").textContent = section.kicker || `Section ${index + 1}`;
     node.querySelector(".segment-title").textContent = section.title || `未命名段落 ${index + 1}`;
-    node.querySelector(".segment-focus").textContent = section.focus || "";
+    const focus = node.querySelector(".segment-focus");
+    if (section.focus) {
+      focus.textContent = section.focus;
+      focus.hidden = false;
+    } else {
+      focus.hidden = true;
+    }
 
     const meta = node.querySelector(".segment-meta");
     if (section.timeRange) {
@@ -233,18 +242,18 @@ function renderSections(sections = []) {
       meta.append(createBadge(section.tag));
     }
 
+    const highlightBlock = node.querySelector(".highlight-block");
     const highlightList = node.querySelector(".highlight-list");
-    highlightList.replaceChildren(...(section.highlights || []).map((item) => {
-      const li = document.createElement("li");
-      li.textContent = item;
-      return li;
-    }));
-
-    const quoteBlock = node.querySelector(".quote-block");
-    if (section.quote) {
-      node.querySelector(".quote-text").textContent = section.quote;
+    const highlights = section.highlights || [];
+    if (highlights.length > 0) {
+      highlightBlock.hidden = false;
+      highlightList.replaceChildren(...highlights.map((item) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        return li;
+      }));
     } else {
-      quoteBlock.hidden = true;
+      highlightBlock.hidden = true;
     }
 
     const transcriptContainer = node.querySelector(".transcript-paragraphs");
@@ -295,7 +304,6 @@ function renderPage(data) {
   fillText("page-subtitle", data.subtitle);
   fillText("content-note", data.contentNote);
   renderMeta(data.meta);
-  renderList("editorial-rules", data.editorialRules);
   renderList("summary-list", data.summaryHighlights);
   renderSpeakers(state.speakerRegistry);
   renderNav(data.sections);
