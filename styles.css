@@ -130,6 +130,11 @@ body {
   padding-left: 18px;
 }
 
+.summary-list li::marker,
+.highlight-list li::marker {
+  color: var(--accent);
+}
+
 .summary-list li + li,
 .highlight-list li + li {
   margin-top: 10px;
@@ -235,6 +240,15 @@ body {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: #fcfcfd;
+}
+
+.highlight-block {
+  border-color: #bfd0e4;
+  background: #f3f7fb;
+}
+
+.highlight-block .block-label {
+  color: #2f567e;
 }
 
 .transcript-paragraphs {
