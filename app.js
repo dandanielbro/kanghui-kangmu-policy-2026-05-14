@@ -56,6 +56,57 @@ function renderList(id, items = []) {
   }));
 }
 
+function getSpeakerToneClass(label = "") {
+  const text = String(label).trim();
+  if (!text) {
+    return "speaker-other";
+  }
+  if (text.includes("一燈")) {
+    return "speaker-host";
+  }
+  if (/(提問者|學員|回應者)/.test(text)) {
+    return "speaker-question";
+  }
+  return "speaker-other";
+}
+
+function splitSpeakerLine(rawText = "") {
+  const text = String(rawText).trim();
+  const match = text.match(/^([^：]{1,20})：(.*)$/u);
+  if (!match) {
+    return null;
+  }
+
+  const label = match[1].trim();
+  const body = match[2].trim();
+  return {
+    label,
+    body,
+    toneClass: getSpeakerToneClass(label)
+  };
+}
+
+function buildSpeakerParagraph(rawText = "") {
+  const p = document.createElement("p");
+  const parsed = splitSpeakerLine(rawText);
+  if (!parsed) {
+    p.textContent = rawText;
+    return p;
+  }
+
+  const speaker = document.createElement("strong");
+  speaker.className = `speaker-label ${parsed.toneClass}`;
+  speaker.textContent = `${parsed.label}：`;
+
+  const text = document.createElement("span");
+  text.className = "speaker-line";
+  text.textContent = parsed.body;
+
+  p.classList.add("has-speaker", parsed.toneClass);
+  p.append(speaker, document.createTextNode(" "), text);
+  return p;
+}
+
 function sanitizeKey(value) {
   return String(value || "")
     .trim()
@@ -262,11 +313,13 @@ function renderSections(sections = []) {
     if (turns.length > 0) {
       transcriptContainer.replaceChildren(...turns.map((turn) => {
         const wrapper = document.createElement("div");
-        wrapper.className = "turn";
+        const speakerLabel = getSpeakerLabel(turn.speaker);
+        const toneClass = getSpeakerToneClass(speakerLabel);
+        wrapper.className = `turn ${toneClass}`;
 
         const speaker = document.createElement("div");
-        speaker.className = "turn-speaker";
-        speaker.textContent = getSpeakerLabel(turn.speaker);
+        speaker.className = `turn-speaker ${toneClass}`;
+        speaker.textContent = `${speakerLabel}：`;
 
         const text = document.createElement("p");
         text.className = "turn-text";
@@ -276,11 +329,7 @@ function renderSections(sections = []) {
         return wrapper;
       }));
     } else {
-      transcriptContainer.replaceChildren(...(section.transcript || []).map((paragraph) => {
-        const p = document.createElement("p");
-        p.textContent = paragraph;
-        return p;
-      }));
+      transcriptContainer.replaceChildren(...(section.transcript || []).map((paragraph) => buildSpeakerParagraph(paragraph)));
     }
 
     const voiceNote = node.querySelector(".voice-note");

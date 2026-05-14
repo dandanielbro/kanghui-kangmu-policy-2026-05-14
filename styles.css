@@ -6,6 +6,13 @@
   --line: #d8dee4;
   --accent: #384860;
   --accent-soft: #eef2f6;
+  --speaker-host: #0f5f69;
+  --speaker-question: #9a5314;
+  --speaker-other: #5f4b8b;
+  --summary-accent: #c96d1a;
+  --summary-accent-dark: #8b4a12;
+  --summary-soft: #fff1e4;
+  --summary-line: #e3a463;
   --radius-lg: 18px;
   --radius-md: 12px;
 }
@@ -132,12 +139,17 @@ body {
 
 .summary-list li::marker,
 .highlight-list li::marker {
-  color: var(--accent);
+  color: var(--summary-accent);
 }
 
 .summary-list li + li,
 .highlight-list li + li {
   margin-top: 10px;
+}
+
+.summary-list li,
+.highlight-list li {
+  font-weight: 650;
 }
 
 .section-nav {
@@ -243,12 +255,12 @@ body {
 }
 
 .highlight-block {
-  border-color: #bfd0e4;
-  background: #f3f7fb;
+  border-color: var(--summary-line);
+  background: var(--summary-soft);
 }
 
 .highlight-block .block-label {
-  color: #2f567e;
+  color: var(--summary-accent-dark);
 }
 
 .transcript-paragraphs {
@@ -260,6 +272,60 @@ body {
 .transcript-paragraphs p {
   margin: 0;
   font-size: 1rem;
+  color: var(--ink);
+}
+
+.speaker-label {
+  font-weight: 800;
+}
+
+.speaker-label.speaker-host {
+  color: var(--speaker-host);
+}
+
+.speaker-label.speaker-question {
+  color: var(--speaker-question);
+}
+
+.speaker-label.speaker-other {
+  color: var(--speaker-other);
+}
+
+.speaker-line {
+  color: var(--muted);
+}
+
+.turn {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #fbfbfa;
+}
+
+.turn-speaker {
+  font-weight: 800;
+}
+
+.turn-text {
+  margin: 0;
+  color: var(--muted);
+}
+
+.turn.speaker-host .turn-speaker,
+.turn-speaker.speaker-host {
+  color: var(--speaker-host);
+}
+
+.turn.speaker-question .turn-speaker,
+.turn-speaker.speaker-question {
+  color: var(--speaker-question);
+}
+
+.turn.speaker-other .turn-speaker,
+.turn-speaker.speaker-other {
+  color: var(--speaker-other);
 }
 
 @media (max-width: 960px) {
