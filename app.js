@@ -300,6 +300,10 @@ function renderPage(data) {
   state.speakerRegistry = buildSpeakerRegistry(data);
   state.speakerAliases = loadSpeakerAliases(state.storageKey);
 
+  if (data.title) {
+    document.title = data.title;
+  }
+
   fillText("page-title", data.title);
   fillText("page-subtitle", data.subtitle);
   fillText("content-note", data.contentNote);
