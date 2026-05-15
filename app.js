@@ -5,37 +5,6 @@ const state = {
   speakerRegistry: []
 };
 
-const EMPHASIS_TERMS = [
-  "康樂富",
-  "康匯",
-  "康沐",
-  "UBO",
-  "Q&A",
-  "超早鳥",
-  "補約轉移",
-  "會員資格",
-  "介紹回饋",
-  "四萬五方案",
-  "十萬變九萬",
-  "三店",
-  "七店",
-  "二十七萬",
-  "二十五萬",
-  "業績歸零",
-  "正常轉移",
-  "換線",
-  "醫美",
-  "保健食品",
-  "控股",
-  "特約",
-  "儲值額度",
-  "不銷而銷",
-  "五月底",
-  "六月",
-  "5 月 31 日",
-  "5 月 24 日"
-];
-
 async function loadTranscript() {
   try {
     const response = await fetch("./content/transcript.json", { cache: "no-store" });
@@ -68,12 +37,6 @@ function escapeHtml(text = "") {
 function applyInlineEmphasis(text = "") {
   let html = escapeHtml(text);
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong class="keyword-strong">$1</strong>');
-
-  for (const term of EMPHASIS_TERMS) {
-    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    html = html.replace(new RegExp(escaped, "g"), `<strong class="keyword-strong">${term}</strong>`);
-  }
-
   return html;
 }
 
