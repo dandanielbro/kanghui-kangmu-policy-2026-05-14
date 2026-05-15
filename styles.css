@@ -147,11 +147,6 @@ body {
   margin-top: 10px;
 }
 
-.summary-list li,
-.highlight-list li {
-  font-weight: 650;
-}
-
 .section-nav {
   display: grid;
   gap: 12px;
@@ -293,6 +288,11 @@ body {
 
 .speaker-line {
   color: var(--muted);
+}
+
+.keyword-strong {
+  font-weight: 800;
+  color: var(--ink);
 }
 
 .turn {

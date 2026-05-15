@@ -5,6 +5,37 @@ const state = {
   speakerRegistry: []
 };
 
+const EMPHASIS_TERMS = [
+  "康樂富",
+  "康匯",
+  "康沐",
+  "UBO",
+  "Q&A",
+  "超早鳥",
+  "補約轉移",
+  "會員資格",
+  "介紹回饋",
+  "四萬五方案",
+  "十萬變九萬",
+  "三店",
+  "七店",
+  "二十七萬",
+  "二十五萬",
+  "業績歸零",
+  "正常轉移",
+  "換線",
+  "醫美",
+  "保健食品",
+  "控股",
+  "特約",
+  "儲值額度",
+  "不銷而銷",
+  "五月底",
+  "六月",
+  "5 月 31 日",
+  "5 月 24 日"
+];
+
 async function loadTranscript() {
   try {
     const response = await fetch("./content/transcript.json", { cache: "no-store" });
@@ -25,6 +56,25 @@ function fillText(id, value) {
   if (element) {
     element.textContent = value || "";
   }
+}
+
+function escapeHtml(text = "") {
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function applyInlineEmphasis(text = "") {
+  let html = escapeHtml(text);
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong class="keyword-strong">$1</strong>');
+
+  for (const term of EMPHASIS_TERMS) {
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    html = html.replace(new RegExp(escaped, "g"), `<strong class="keyword-strong">${term}</strong>`);
+  }
+
+  return html;
 }
 
 function renderMeta(meta = {}) {
@@ -51,7 +101,7 @@ function renderList(id, items = []) {
   }
   container.replaceChildren(...items.map((item) => {
     const li = document.createElement("li");
-    li.textContent = item;
+    li.innerHTML = applyInlineEmphasis(item);
     return li;
   }));
 }
@@ -90,7 +140,7 @@ function buildSpeakerParagraph(rawText = "") {
   const p = document.createElement("p");
   const parsed = splitSpeakerLine(rawText);
   if (!parsed) {
-    p.textContent = rawText;
+    p.innerHTML = applyInlineEmphasis(rawText);
     return p;
   }
 
@@ -100,7 +150,7 @@ function buildSpeakerParagraph(rawText = "") {
 
   const text = document.createElement("span");
   text.className = "speaker-line";
-  text.textContent = parsed.body;
+  text.innerHTML = applyInlineEmphasis(parsed.body);
 
   p.classList.add("has-speaker", parsed.toneClass);
   p.append(speaker, document.createTextNode(" "), text);
@@ -279,7 +329,7 @@ function renderSections(sections = []) {
     node.querySelector(".segment-title").textContent = section.title || `未命名段落 ${index + 1}`;
     const focus = node.querySelector(".segment-focus");
     if (section.focus) {
-      focus.textContent = section.focus;
+      focus.innerHTML = applyInlineEmphasis(section.focus);
       focus.hidden = false;
     } else {
       focus.hidden = true;
@@ -300,7 +350,7 @@ function renderSections(sections = []) {
       highlightBlock.hidden = false;
       highlightList.replaceChildren(...highlights.map((item) => {
         const li = document.createElement("li");
-        li.textContent = item;
+        li.innerHTML = applyInlineEmphasis(item);
         return li;
       }));
     } else {
@@ -323,7 +373,7 @@ function renderSections(sections = []) {
 
         const text = document.createElement("p");
         text.className = "turn-text";
-        text.textContent = turn.text || "";
+        text.innerHTML = applyInlineEmphasis(turn.text || "");
 
         wrapper.append(speaker, text);
         return wrapper;
@@ -334,7 +384,7 @@ function renderSections(sections = []) {
 
     const voiceNote = node.querySelector(".voice-note");
     if (section.voiceNote) {
-      node.querySelector(".voice-note-text").textContent = section.voiceNote;
+      node.querySelector(".voice-note-text").innerHTML = applyInlineEmphasis(section.voiceNote);
     } else {
       voiceNote.hidden = true;
     }

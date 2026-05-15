@@ -444,6 +444,55 @@
   </div>
   <script>
     (() => {
+      const emphasisTerms = [
+        "康樂富",
+        "康匯",
+        "康沐",
+        "UBO",
+        "Q&A",
+        "超早鳥",
+        "補約轉移",
+        "會員資格",
+        "介紹回饋",
+        "四萬五方案",
+        "十萬變九萬",
+        "三店",
+        "七店",
+        "二十七萬",
+        "二十五萬",
+        "業績歸零",
+        "正常轉移",
+        "換線",
+        "醫美",
+        "保健食品",
+        "控股",
+        "特約",
+        "儲值額度",
+        "不銷而銷",
+        "五月底",
+        "六月",
+        "5 月 31 日",
+        "5 月 24 日"
+      ];
+
+      const escapeHtml = (text) =>
+        text
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;");
+
+      const applyInlineEmphasis = (text) => {
+        let html = escapeHtml(text);
+        html = html.replace(/\*\*(.+?)\*\*/g, '<strong class="keyword-strong">$1</strong>');
+
+        for (const term of emphasisTerms) {
+          const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          html = html.replace(new RegExp(escaped, "g"), `<strong class="keyword-strong">${term}</strong>`);
+        }
+
+        return html;
+      };
+
       const toneForSpeaker = (label) => {
         if (label.includes("一燈")) return "speaker-host";
         if (/(提問者|學員|回應者)/.test(label)) return "speaker-question";
@@ -465,9 +514,13 @@
 
         const text = document.createElement("span");
         text.className = "speaker-line";
-        text.textContent = body;
+        text.innerHTML = applyInlineEmphasis(body);
 
         paragraph.replaceChildren(speaker, document.createTextNode(" "), text);
+      });
+
+      document.querySelectorAll(".summary-list li, .highlight-list li, .content-note, .hero-lede").forEach((node) => {
+        node.innerHTML = applyInlineEmphasis(node.textContent.trim());
       });
     })();
   </script>
